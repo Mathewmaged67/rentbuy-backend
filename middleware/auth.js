@@ -1,7 +1,10 @@
 const jwt = require('jsonwebtoken');
 
-// Secret key for JWT (in production, use process.env.JWT_SECRET)
-const JWT_SECRET = process.env.JWT_SECRET || 'super-secret-development-key';
+// Read lazily so this always reflects process.env regardless of require() order
+const HARDCODED_SECRET = 'rentbuy_super_secret_jwt_key_change_in_production';
+const getSecret = () => process.env.JWT_SECRET || HARDCODED_SECRET;
+
+
 
 /**
  * Middleware to verify JWT token and authenticate user
@@ -16,17 +19,24 @@ const authenticateToken = (req, res, next) => {
   }
 
   try {
-    const decoded = jwt.verify(token, JWT_SECRET);
-    req.user = decoded; // Attach user info (id, role, etc.) to request
+    const secret = getSecret();
+    const decoded = jwt.verify(token, secret);
+    req.user = decoded;
     next();
   } catch (error) {
-    return res.status(403).json({ message: 'Invalid or expired token.' });
+    console.error('[Auth] Verification failed:', error.message);
+    if (error.name === 'TokenExpiredError') {
+      return res.status(403).json({ message: 'Token expired. Please login again.' });
+    }
+    return res.status(403).json({ message: 'Invalid token. Please login again.' });
   }
+
+
 };
 
 /**
  * Middleware factory to authorize specific roles
- * @param {Array<string>} roles - Allowed roles (e.g., ['admin', 'seller'])
+ * @param {...string} roles - Allowed roles (e.g., 'admin', 'seller')
  */
 const authorizeRoles = (...roles) => {
   return (req, res, next) => {
@@ -37,8 +47,9 @@ const authorizeRoles = (...roles) => {
   };
 };
 
+// JWT_SECRET exported as a getter so callers always get the live value
 module.exports = {
   authenticateToken,
   authorizeRoles,
-  JWT_SECRET
+  get JWT_SECRET() { return getSecret(); },
 };

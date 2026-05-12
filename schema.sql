@@ -36,8 +36,36 @@ CREATE TABLE IF NOT EXISTS customers (
     password VARCHAR(255) NOT NULL,
     phone VARCHAR(50),
     address TEXT,
+    dob DATE,
     role VARCHAR(50) DEFAULT 'customer',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS pending_registrations (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    phone VARCHAR(50),
+    address TEXT,
+    dob DATE,
+    role VARCHAR(50) DEFAULT 'customer',
+    verification_token VARCHAR(255) UNIQUE NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
+CREATE TABLE IF NOT EXISTS orders (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    customerId INT NOT NULL,
+    productId VARCHAR(50) NOT NULL,
+    type VARCHAR(10) NOT NULL COMMENT 'buy or rent',
+    days INT DEFAULT NULL,
+    total DECIMAL(10, 2) NOT NULL,
+    payment VARCHAR(20) NOT NULL COMMENT 'cod or online',
+    status VARCHAR(20) DEFAULT 'pending',
+    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (customerId) REFERENCES customers(id) ON DELETE CASCADE
 );
 
 INSERT IGNORE INTO categories (slug, name) VALUES 

@@ -2,8 +2,11 @@
   "name": "backend",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "server_updated_v2.js",
   "scripts": {
+    "start": "node server_updated_v2.js",
+    "dev": "nodemon server_updated_v2.js",
+    "setup": "node setup.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -19,6 +22,9 @@
     "express-validator": "^7.3.2",
     "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.3",
-    "mysql2": "^3.22.3"
+    "mysql2": "^3.22.3",
+    "node-cron": "^4.2.1",
+    "nodemailer": "^8.0.7",
+    "pdfkit": "^0.18.0"
   }
 }
